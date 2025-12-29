@@ -173,14 +173,14 @@
     </div>
 
     <!-- Header -->
-    <header class="bg-gradient-to-r from-green-700 via-emerald-600 to-green-700 text-white p-4 shadow-lg">
+    <header class="bg-gradient-to-r from-green-700 via-emerald-600 to-green-700 text-white py-2 px-4 shadow-lg">
         <div class="text-center">
-            <h1 class="text-2xl font-bold flex items-center justify-center gap-2">
+            <h1 class="text-xl font-bold flex items-center justify-center gap-2">
                 <span>☪</span>
                 <span>دستیار بندگی</span>
                 <span>☪</span>
             </h1>
-            <p id="currentDate" class="text-green-100 text-sm mt-1"></p>
+            <p id="currentDate" class="text-green-100 text-xs"></p>
         </div>
     </header>
 
@@ -801,8 +801,9 @@
                 const dailyScore = prayerScore + duaScore + quranScore;
                 
                 chartData.unshift({
-                    day: currentDashboardTab === 'weekly' ? getPersianDayName(date).substring(0, 3) : toPersianNum(i + 1),
-                    score: dailyScore
+                    day: currentDashboardTab === 'weekly' ? getPersianDayName(date) : toPersianNum(i + 1),
+                    score: dailyScore,
+                    dateObj: new Date(date)
                 });
             }
             
@@ -829,14 +830,23 @@
                 performanceChart.destroy();
             }
             
+            // Sort data by Persian week order (Saturday to Friday) for weekly view
+            let sortedData = data;
+            if (currentDashboardTab === 'weekly') {
+                const persianDayOrder = ['شنبه', 'یکشنبه', 'دوشنبه', 'سه‌شنبه', 'چهارشنبه', 'پنجشنبه', 'جمعه'];
+                sortedData = [...data].sort((a, b) => {
+                    return persianDayOrder.indexOf(a.day) - persianDayOrder.indexOf(b.day);
+                });
+            }
+            
             performanceChart = new Chart(ctx, {
                 type: 'line',
                 data: {
-                    labels: data.map(d => d.day),
+                    labels: sortedData.map(d => d.day),
                     datasets: [
                         {
                             label: 'امتیاز روزانه',
-                            data: data.map(d => d.score),
+                            data: sortedData.map(d => d.score),
                             borderColor: '#059669',
                             backgroundColor: 'rgba(5, 150, 105, 0.2)',
                             fill: true,
@@ -875,7 +885,13 @@
                         },
                         x: {
                             ticks: {
-                                color: textColor
+                                color: textColor,
+                                font: {
+                                    size: 10,
+                                    family: 'Vazirmatn'
+                                },
+                                maxRotation: 45,
+                                minRotation: 45
                             },
                             grid: {
                                 color: gridColor
