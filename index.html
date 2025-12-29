@@ -201,6 +201,125 @@
             border-radius: 10px;
             color: var(--text-main);
         }
+        
+        /* Custom Prayer Selector */
+        .prayer-selector {
+            position: relative;
+            width: 140px;
+        }
+        
+        .prayer-selected {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 10px 14px;
+            background: var(--bg-card);
+            border: 2px solid var(--border-color);
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-size: 0.85rem;
+            font-weight: 500;
+            color: var(--text-main);
+        }
+        
+        .prayer-selected:hover {
+            border-color: var(--primary);
+        }
+        
+        .prayer-selected.open {
+            border-color: var(--primary);
+            border-radius: 12px 12px 0 0;
+        }
+        
+        .prayer-selected .arrow {
+            transition: transform 0.3s;
+            font-size: 0.7rem;
+        }
+        
+        .prayer-selected.open .arrow {
+            transform: rotate(180deg);
+        }
+        
+        .prayer-options {
+            position: absolute;
+            top: 100%;
+            left: 0;
+            right: 0;
+            background: var(--bg-card);
+            border: 2px solid var(--primary);
+            border-top: none;
+            border-radius: 0 0 12px 12px;
+            overflow: hidden;
+            z-index: 100;
+            display: none;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.15);
+        }
+        
+        .prayer-options.show {
+            display: block;
+            animation: dropdownFade 0.2s ease;
+        }
+        
+        @keyframes dropdownFade {
+            from { opacity: 0; transform: translateY(-10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .prayer-option {
+            padding: 12px 14px;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 0.85rem;
+            border-bottom: 1px solid var(--border-color);
+        }
+        
+        .prayer-option:last-child {
+            border-bottom: none;
+        }
+        
+        .prayer-option:hover {
+            background: var(--bg-main);
+        }
+        
+        .prayer-option.selected {
+            background: var(--primary);
+            color: white;
+        }
+        
+        .prayer-option .option-icon {
+            font-size: 1rem;
+        }
+        
+        .prayer-option.early { border-right: 4px solid #22c55e; }
+        .prayer-option.mid { border-right: 4px solid #eab308; }
+        .prayer-option.late { border-right: 4px solid #f97316; }
+        .prayer-option.qaza { border-right: 4px solid #dc2626; }
+        
+        .prayer-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            padding: 2px 8px;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 600;
+        }
+        
+        .prayer-badge.early { background: #dcfce7; color: #166534; }
+        .prayer-badge.mid { background: #fef9c3; color: #854d0e; }
+        .prayer-badge.late { background: #ffedd5; color: #9a3412; }
+        .prayer-badge.qaza { background: #fee2e2; color: #991b1b; }
+        .prayer-badge.none { background: #f3f4f6; color: #6b7280; }
+        
+        .dark .prayer-badge.early { background: #14532d; color: #86efac; }
+        .dark .prayer-badge.mid { background: #713f12; color: #fde047; }
+        .dark .prayer-badge.late { background: #7c2d12; color: #fdba74; }
+        .dark .prayer-badge.qaza { background: #7f1d1d; color: #fca5a5; }
+        .dark .prayer-badge.none { background: #374151; color: #9ca3af; }
     </style>
 </head>
 <body class="islamic-pattern pb-20">
@@ -230,7 +349,7 @@
         <div class="flex items-start gap-2">
             <span class="text-2xl">📿</span>
             <div>
-                <p class="text-xs opacity-80 mb-1">حکمت امام علی (ع):</p>
+                <p class="text-xs opacity-80 mb-1">حکمت امیرالمومنین (ع):</p>
                 <p id="dailyHadith" class="text-sm leading-relaxed font-medium"></p>
             </div>
         </div>
@@ -279,36 +398,87 @@
                     <div class="space-y-3">
                         <div class="flex items-center justify-between p-3 rounded-xl" style="background: var(--bg-main)">
                             <span class="font-medium">نماز صبح</span>
-                            <select id="prayerFajr" class="p-2 rounded-lg text-sm prayer-select" 
-                                    style="background: var(--bg-card); border: 1px solid var(--border-color); color: var(--text-main)">
-                                <option value="">انتخاب کنید</option>
-                                <option value="early">اول وقت ⭐⭐⭐</option>
-                                <option value="mid">میان وقت ⭐⭐</option>
-                                <option value="late">آخر وقت ⭐</option>
-                                <option value="qaza">نماز قضا ❌</option>
-                            </select>
+                            <div class="prayer-selector" id="selectorFajr">
+                                <input type="hidden" id="prayerFajr" value="">
+                                <div class="prayer-selected" onclick="togglePrayerDropdown('Fajr')">
+                                    <span class="selected-text">انتخاب کنید</span>
+                                    <span class="arrow">▼</span>
+                                </div>
+                                <div class="prayer-options" id="optionsFajr">
+                                    <div class="prayer-option early" data-value="early" onclick="selectPrayer('Fajr', 'early', 'اول وقت', '⭐⭐⭐')">
+                                        <span class="option-icon">⭐⭐⭐</span>
+                                        <span>اول وقت</span>
+                                    </div>
+                                    <div class="prayer-option mid" data-value="mid" onclick="selectPrayer('Fajr', 'mid', 'میان وقت', '⭐⭐')">
+                                        <span class="option-icon">⭐⭐</span>
+                                        <span>میان وقت</span>
+                                    </div>
+                                    <div class="prayer-option late" data-value="late" onclick="selectPrayer('Fajr', 'late', 'آخر وقت', '⭐')">
+                                        <span class="option-icon">⭐</span>
+                                        <span>آخر وقت</span>
+                                    </div>
+                                    <div class="prayer-option qaza" data-value="qaza" onclick="selectPrayer('Fajr', 'qaza', 'نماز قضا', '❌')">
+                                        <span class="option-icon">❌</span>
+                                        <span>نماز قضا</span>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
                         <div class="flex items-center justify-between p-3 rounded-xl" style="background: var(--bg-main)">
                             <span class="font-medium">نماز ظهر</span>
-                            <select id="prayerDhuhr" class="p-2 rounded-lg text-sm prayer-select"
-                                    style="background: var(--bg-card); border: 1px solid var(--border-color); color: var(--text-main)">
-                                <option value="">انتخاب کنید</option>
-                                <option value="early">اول وقت ⭐⭐⭐</option>
-                                <option value="mid">میان وقت ⭐⭐</option>
-                                <option value="late">آخر وقت ⭐</option>
-                                <option value="qaza">نماز قضا ❌</option>
-                            </select>
+                            <div class="prayer-selector" id="selectorDhuhr">
+                                <input type="hidden" id="prayerDhuhr" value="">
+                                <div class="prayer-selected" onclick="togglePrayerDropdown('Dhuhr')">
+                                    <span class="selected-text">انتخاب کنید</span>
+                                    <span class="arrow">▼</span>
+                                </div>
+                                <div class="prayer-options" id="optionsDhuhr">
+                                    <div class="prayer-option early" data-value="early" onclick="selectPrayer('Dhuhr', 'early', 'اول وقت', '⭐⭐⭐')">
+                                        <span class="option-icon">⭐⭐⭐</span>
+                                        <span>اول وقت</span>
+                                    </div>
+                                    <div class="prayer-option mid" data-value="mid" onclick="selectPrayer('Dhuhr', 'mid', 'میان وقت', '⭐⭐')">
+                                        <span class="option-icon">⭐⭐</span>
+                                        <span>میان وقت</span>
+                                    </div>
+                                    <div class="prayer-option late" data-value="late" onclick="selectPrayer('Dhuhr', 'late', 'آخر وقت', '⭐')">
+                                        <span class="option-icon">⭐</span>
+                                        <span>آخر وقت</span>
+                                    </div>
+                                    <div class="prayer-option qaza" data-value="qaza" onclick="selectPrayer('Dhuhr', 'qaza', 'نماز قضا', '❌')">
+                                        <span class="option-icon">❌</span>
+                                        <span>نماز قضا</span>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
                         <div class="flex items-center justify-between p-3 rounded-xl" style="background: var(--bg-main)">
                             <span class="font-medium">نماز مغرب</span>
-                            <select id="prayerMaghrib" class="p-2 rounded-lg text-sm prayer-select"
-                                    style="background: var(--bg-card); border: 1px solid var(--border-color); color: var(--text-main)">
-                                <option value="">انتخاب کنید</option>
-                                <option value="early">اول وقت ⭐⭐⭐</option>
-                                <option value="mid">میان وقت ⭐⭐</option>
-                                <option value="late">آخر وقت ⭐</option>
-                                <option value="qaza">نماز قضا ❌</option>
-                            </select>
+                            <div class="prayer-selector" id="selectorMaghrib">
+                                <input type="hidden" id="prayerMaghrib" value="">
+                                <div class="prayer-selected" onclick="togglePrayerDropdown('Maghrib')">
+                                    <span class="selected-text">انتخاب کنید</span>
+                                    <span class="arrow">▼</span>
+                                </div>
+                                <div class="prayer-options" id="optionsMaghrib">
+                                    <div class="prayer-option early" data-value="early" onclick="selectPrayer('Maghrib', 'early', 'اول وقت', '⭐⭐⭐')">
+                                        <span class="option-icon">⭐⭐⭐</span>
+                                        <span>اول وقت</span>
+                                    </div>
+                                    <div class="prayer-option mid" data-value="mid" onclick="selectPrayer('Maghrib', 'mid', 'میان وقت', '⭐⭐')">
+                                        <span class="option-icon">⭐⭐</span>
+                                        <span>میان وقت</span>
+                                    </div>
+                                    <div class="prayer-option late" data-value="late" onclick="selectPrayer('Maghrib', 'late', 'آخر وقت', '⭐')">
+                                        <span class="option-icon">⭐</span>
+                                        <span>آخر وقت</span>
+                                    </div>
+                                    <div class="prayer-option qaza" data-value="qaza" onclick="selectPrayer('Maghrib', 'qaza', 'نماز قضا', '❌')">
+                                        <span class="option-icon">❌</span>
+                                        <span>نماز قضا</span>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -753,9 +923,9 @@
             const dayData = allData[dateKey];
             
             // Reset form
-            document.getElementById('prayerFajr').value = '';
-            document.getElementById('prayerDhuhr').value = '';
-            document.getElementById('prayerMaghrib').value = '';
+            resetPrayerSelector('Fajr');
+            resetPrayerSelector('Dhuhr');
+            resetPrayerSelector('Maghrib');
             document.getElementById('duaAshura').checked = false;
             document.getElementById('duaAlyasin').checked = false;
             document.getElementById('duaAminullah').checked = false;
@@ -770,9 +940,9 @@
             
             // Load existing data
             if (dayData) {
-                document.getElementById('prayerFajr').value = dayData.prayerFajr || '';
-                document.getElementById('prayerDhuhr').value = dayData.prayerDhuhr || '';
-                document.getElementById('prayerMaghrib').value = dayData.prayerMaghrib || '';
+                setPrayerSelectorValue('Fajr', dayData.prayerFajr || '');
+                setPrayerSelectorValue('Dhuhr', dayData.prayerDhuhr || '');
+                setPrayerSelectorValue('Maghrib', dayData.prayerMaghrib || '');
                 document.getElementById('duaAshura').checked = dayData.duaAshura || false;
                 document.getElementById('duaAlyasin').checked = dayData.duaAlyasin || false;
                 document.getElementById('duaAminullah').checked = dayData.duaAminullah || false;
@@ -809,7 +979,7 @@
             const dayData = allData[dateKey];
             
             // Get form elements
-            const formElements = document.querySelectorAll('#dailyPage select, #dailyPage input[type="checkbox"]');
+            const formElements = document.querySelectorAll('#dailyPage input[type="checkbox"]');
             const quranBtns = document.querySelectorAll('.quran-btn');
             
             if (selected > today) {
@@ -821,6 +991,7 @@
                 submitBtn.textContent = 'ثبت اعمال';
                 formElements.forEach(el => el.disabled = true);
                 quranBtns.forEach(btn => btn.disabled = true);
+                setDropdownsDisabled(true);
             } else if (dayData && dayData.submitted) {
                 // Already submitted
                 statusDiv.innerHTML = '<span class="text-green-600">✅ اعمال این روز ثبت شده است</span>';
@@ -830,6 +1001,7 @@
                 submitBtn.textContent = 'ثبت شده ✓';
                 formElements.forEach(el => el.disabled = true);
                 quranBtns.forEach(btn => btn.disabled = true);
+                setDropdownsDisabled(true);
             } else if (selected < today) {
                 // Past date, not submitted
                 statusDiv.innerHTML = '<span class="text-yellow-600">⚠️ این روز گذشته است - می‌توانید اعمال را ثبت کنید</span>';
@@ -839,6 +1011,7 @@
                 submitBtn.textContent = 'ثبت اعمال';
                 formElements.forEach(el => el.disabled = false);
                 quranBtns.forEach(btn => btn.disabled = false);
+                setDropdownsDisabled(false);
             } else {
                 // Today, not submitted
                 statusDiv.innerHTML = '<span class="text-blue-600">📝 امروز - آماده ثبت</span>';
@@ -848,6 +1021,7 @@
                 submitBtn.textContent = 'ثبت اعمال';
                 formElements.forEach(el => el.disabled = false);
                 quranBtns.forEach(btn => btn.disabled = false);
+                setDropdownsDisabled(false);
             }
         }
 
@@ -1120,6 +1294,106 @@
             }
             localStorage.setItem('bandegi_dark', isDark);
         }
+
+        // Custom Prayer Dropdown Functions
+        function togglePrayerDropdown(prayerName) {
+            const selector = document.getElementById('selector' + prayerName);
+            const options = document.getElementById('options' + prayerName);
+            const selected = selector.querySelector('.prayer-selected');
+            
+            // Close all other dropdowns
+            document.querySelectorAll('.prayer-options').forEach(opt => {
+                if (opt.id !== 'options' + prayerName) {
+                    opt.classList.remove('show');
+                    opt.parentElement.querySelector('.prayer-selected').classList.remove('open');
+                }
+            });
+            
+            // Toggle current dropdown
+            options.classList.toggle('show');
+            selected.classList.toggle('open');
+        }
+
+        function selectPrayer(prayerName, value, text, icon) {
+            const input = document.getElementById('prayer' + prayerName);
+            const selector = document.getElementById('selector' + prayerName);
+            const selected = selector.querySelector('.prayer-selected');
+            const selectedText = selector.querySelector('.selected-text');
+            const options = document.getElementById('options' + prayerName);
+            
+            // Update hidden input
+            input.value = value;
+            
+            // Update selected text with badge
+            selectedText.innerHTML = `<span class="prayer-badge ${value}">${icon} ${text}</span>`;
+            
+            // Update selected state in options
+            options.querySelectorAll('.prayer-option').forEach(opt => {
+                opt.classList.remove('selected');
+                if (opt.dataset.value === value) {
+                    opt.classList.add('selected');
+                }
+            });
+            
+            // Close dropdown
+            options.classList.remove('show');
+            selected.classList.remove('open');
+        }
+
+        function resetPrayerSelector(prayerName) {
+            const selector = document.getElementById('selector' + prayerName);
+            const selectedText = selector.querySelector('.selected-text');
+            const options = document.getElementById('options' + prayerName);
+            const input = document.getElementById('prayer' + prayerName);
+            
+            input.value = '';
+            selectedText.innerHTML = 'انتخاب کنید';
+            options.querySelectorAll('.prayer-option').forEach(opt => {
+                opt.classList.remove('selected');
+            });
+        }
+
+        function setPrayerSelectorValue(prayerName, value) {
+            if (!value) {
+                resetPrayerSelector(prayerName);
+                return;
+            }
+            
+            const labels = {
+                'early': { text: 'اول وقت', icon: '⭐⭐⭐' },
+                'mid': { text: 'میان وقت', icon: '⭐⭐' },
+                'late': { text: 'آخر وقت', icon: '⭐' },
+                'qaza': { text: 'نماز قضا', icon: '❌' }
+            };
+            
+            if (labels[value]) {
+                selectPrayer(prayerName, value, labels[value].text, labels[value].icon);
+            }
+        }
+
+        function setDropdownsDisabled(disabled) {
+            document.querySelectorAll('.prayer-selector').forEach(selector => {
+                if (disabled) {
+                    selector.style.pointerEvents = 'none';
+                    selector.style.opacity = '0.6';
+                } else {
+                    selector.style.pointerEvents = 'auto';
+                    selector.style.opacity = '1';
+                }
+            });
+        }
+
+        // Close dropdowns when clicking outside
+        document.addEventListener('click', function(e) {
+            if (!e.target.closest('.prayer-selector')) {
+                document.querySelectorAll('.prayer-options').forEach(opt => {
+                    opt.classList.remove('show');
+                });
+                document.querySelectorAll('.prayer-selected').forEach(sel => {
+                    sel.classList.remove('open');
+                });
+            }
+        });
     </script>
 </body>
 </html>
