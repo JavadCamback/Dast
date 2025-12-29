@@ -1,0 +1,1086 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>دستیار بندگی</title>
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        * {
+            font-family: 'Vazirmatn', sans-serif;
+        }
+        
+        :root {
+            --primary: #166534;
+            --primary-light: #22c55e;
+            --bg-main: #f0fdf4;
+            --bg-card: #ffffff;
+            --text-main: #14532d;
+            --text-secondary: #166534;
+            --border-color: #bbf7d0;
+        }
+        
+        .dark {
+            --primary: #22c55e;
+            --primary-light: #4ade80;
+            --bg-main: #0f1f17;
+            --bg-card: #1a2e23;
+            --text-main: #dcfce7;
+            --text-secondary: #86efac;
+            --border-color: #14532d;
+        }
+        
+        body {
+            background: var(--bg-main);
+            color: var(--text-main);
+            min-height: 100vh;
+            transition: all 0.3s ease;
+        }
+        
+        .card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+        }
+        
+        .islamic-pattern {
+            background-image: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%2322c55e' fill-opacity='0.1'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+        }
+        
+        .nav-item.active {
+            color: var(--primary);
+            background: var(--border-color);
+        }
+        
+        .checkbox-custom:checked {
+            background-color: var(--primary);
+        }
+        
+        .slide-up {
+            animation: slideUp 0.3s ease;
+        }
+        
+        @keyframes slideUp {
+            from { transform: translateY(20px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+        
+        .pulse-green {
+            animation: pulseGreen 2s infinite;
+        }
+        
+        @keyframes pulseGreen {
+            0%, 100% { box-shadow: 0 0 0 0 rgba(34, 197, 94, 0.4); }
+            50% { box-shadow: 0 0 0 10px rgba(34, 197, 94, 0); }
+        }
+        
+        .toggle-switch {
+            position: relative;
+            width: 60px;
+            height: 32px;
+        }
+        
+        .toggle-switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+        
+        .toggle-slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: #ccc;
+            transition: 0.4s;
+            border-radius: 34px;
+        }
+        
+        .toggle-slider:before {
+            position: absolute;
+            content: "";
+            height: 24px;
+            width: 24px;
+            right: 4px;
+            bottom: 4px;
+            background-color: white;
+            transition: 0.4s;
+            border-radius: 50%;
+        }
+        
+        input:checked + .toggle-slider {
+            background-color: var(--primary);
+        }
+        
+        input:checked + .toggle-slider:before {
+            transform: translateX(-28px);
+        }
+        
+        .hadith-box {
+            background: linear-gradient(135deg, var(--primary) 0%, #15803d 100%);
+            color: white;
+        }
+        
+        .date-nav-btn {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: var(--bg-main);
+            border: 2px solid var(--border-color);
+            color: var(--text-main);
+            font-size: 1.2rem;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .date-nav-btn:hover:not(:disabled) {
+            background: var(--primary);
+            color: white;
+            border-color: var(--primary);
+        }
+        
+        .date-nav-btn:disabled {
+            opacity: 0.4;
+            cursor: not-allowed;
+        }
+        
+        .quran-counter {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .quran-btn {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: var(--primary);
+            color: white;
+            font-size: 1.3rem;
+            font-weight: bold;
+            cursor: pointer;
+            border: none;
+            transition: all 0.2s;
+        }
+        
+        .quran-btn:hover:not(:disabled) {
+            transform: scale(1.1);
+            background: #15803d;
+        }
+        
+        .quran-btn:disabled {
+            opacity: 0.4;
+            cursor: not-allowed;
+        }
+        
+        .quran-display {
+            width: 60px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+            font-weight: bold;
+            background: var(--bg-card);
+            border: 2px solid var(--border-color);
+            border-radius: 10px;
+            color: var(--text-main);
+        }
+    </style>
+</head>
+<body class="islamic-pattern pb-20">
+    <!-- Header -->
+    <header class="bg-gradient-to-l from-green-700 to-green-600 text-white p-4 sticky top-0 z-50 shadow-lg">
+        <div class="flex items-center justify-between">
+            <div class="flex items-center gap-2">
+                <span class="text-2xl">🕌</span>
+                <h1 class="text-xl font-bold">دستیار بندگی</h1>
+            </div>
+            <div class="text-left">
+                <div id="hijriDate" class="text-sm font-medium"></div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Hadith Section -->
+    <div id="hadithBox" class="hadith-box mx-4 mt-4 p-4 rounded-2xl shadow-lg slide-up">
+        <div class="flex items-start gap-2">
+            <span class="text-2xl">📿</span>
+            <div>
+                <p class="text-xs opacity-80 mb-1">حکمت امام علی (ع):</p>
+                <p id="dailyHadith" class="text-sm leading-relaxed font-medium"></p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Date Navigation -->
+    <div class="card mx-4 mt-4 p-4 rounded-2xl shadow-md slide-up">
+        <div class="flex items-center justify-between">
+            <button id="nextDayBtn" class="date-nav-btn" onclick="changeDate(1)">
+                ◀
+            </button>
+            <div class="text-center flex-1">
+                <p id="currentPersianDate" class="text-lg font-bold" style="color: var(--text-main)"></p>
+                <p id="currentDayName" class="text-sm opacity-70"></p>
+            </div>
+            <button id="prevDayBtn" class="date-nav-btn" onclick="changeDate(-1)">
+                ▶
+            </button>
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <main id="mainContent" class="p-4">
+        <!-- Daily Entry Page -->
+        <section id="dailyPage" class="page active">
+            <div class="card rounded-2xl p-4 mb-4 shadow-md slide-up">
+                <div class="flex items-center justify-between mb-4">
+                    <h2 class="text-lg font-bold flex items-center gap-2" style="color: var(--text-main)">
+                        <span>📅</span>
+                        ثبت اعمال روزانه
+                    </h2>
+                </div>
+                
+                <div id="dateStatus" class="mb-4 p-3 rounded-xl text-center text-sm font-medium"></div>
+
+                <!-- Prayers Section -->
+                <div class="mb-6">
+                    <h3 class="font-bold mb-3 flex items-center gap-2" style="color: var(--text-secondary)">
+                        <span>🕋</span>
+                        نمازها
+                    </h3>
+                    <div class="space-y-3">
+                        <div class="flex items-center justify-between p-3 rounded-xl" style="background: var(--bg-main)">
+                            <span class="font-medium">نماز صبح</span>
+                            <select id="prayerFajr" class="p-2 rounded-lg text-sm prayer-select" 
+                                    style="background: var(--bg-card); border: 1px solid var(--border-color); color: var(--text-main)">
+                                <option value="">انتخاب کنید</option>
+                                <option value="early">اول وقت ⭐⭐⭐</option>
+                                <option value="mid">میان وقت ⭐⭐</option>
+                                <option value="late">آخر وقت ⭐</option>
+                                <option value="qaza">نماز قضا ❌</option>
+                            </select>
+                        </div>
+                        <div class="flex items-center justify-between p-3 rounded-xl" style="background: var(--bg-main)">
+                            <span class="font-medium">نماز ظهر</span>
+                            <select id="prayerDhuhr" class="p-2 rounded-lg text-sm prayer-select"
+                                    style="background: var(--bg-card); border: 1px solid var(--border-color); color: var(--text-main)">
+                                <option value="">انتخاب کنید</option>
+                                <option value="early">اول وقت ⭐⭐⭐</option>
+                                <option value="mid">میان وقت ⭐⭐</option>
+                                <option value="late">آخر وقت ⭐</option>
+                                <option value="qaza">نماز قضا ❌</option>
+                            </select>
+                        </div>
+                        <div class="flex items-center justify-between p-3 rounded-xl" style="background: var(--bg-main)">
+                            <span class="font-medium">نماز مغرب</span>
+                            <select id="prayerMaghrib" class="p-2 rounded-lg text-sm prayer-select"
+                                    style="background: var(--bg-card); border: 1px solid var(--border-color); color: var(--text-main)">
+                                <option value="">انتخاب کنید</option>
+                                <option value="early">اول وقت ⭐⭐⭐</option>
+                                <option value="mid">میان وقت ⭐⭐</option>
+                                <option value="late">آخر وقت ⭐</option>
+                                <option value="qaza">نماز قضا ❌</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Duas Section -->
+                <div class="mb-6">
+                    <h3 class="font-bold mb-3 flex items-center gap-2" style="color: var(--text-secondary)">
+                        <span>📖</span>
+                        دعاها و زیارات
+                    </h3>
+                    <div class="grid grid-cols-2 gap-2">
+                        <label class="flex items-center gap-2 p-3 rounded-xl cursor-pointer transition-all hover:scale-[1.02]" 
+                               style="background: var(--bg-main)">
+                            <input type="checkbox" id="duaAshura" class="w-5 h-5 rounded checkbox-custom accent-green-600">
+                            <span class="text-sm">دعای عاشورا</span>
+                        </label>
+                        <label class="flex items-center gap-2 p-3 rounded-xl cursor-pointer transition-all hover:scale-[1.02]"
+                               style="background: var(--bg-main)">
+                            <input type="checkbox" id="duaAlyasin" class="w-5 h-5 rounded checkbox-custom accent-green-600">
+                            <span class="text-sm">آل یاسین</span>
+                        </label>
+                        <label class="flex items-center gap-2 p-3 rounded-xl cursor-pointer transition-all hover:scale-[1.02]"
+                               style="background: var(--bg-main)">
+                            <input type="checkbox" id="duaAminullah" class="w-5 h-5 rounded checkbox-custom accent-green-600">
+                            <span class="text-sm">امین الله</span>
+                        </label>
+                        <label class="flex items-center gap-2 p-3 rounded-xl cursor-pointer transition-all hover:scale-[1.02]"
+                               style="background: var(--bg-main)">
+                            <input type="checkbox" id="duaSalavat" class="w-5 h-5 rounded checkbox-custom accent-green-600">
+                            <span class="text-sm">صلوات حضرت زهرا</span>
+                        </label>
+                        <label class="flex items-center gap-2 p-3 rounded-xl cursor-pointer transition-all hover:scale-[1.02]"
+                               style="background: var(--bg-main)">
+                            <input type="checkbox" id="duaAhd" class="w-5 h-5 rounded checkbox-custom accent-green-600">
+                            <span class="text-sm">دعای عهد</span>
+                        </label>
+                        <label class="flex items-center gap-2 p-3 rounded-xl cursor-pointer transition-all hover:scale-[1.02]"
+                               style="background: var(--bg-main)">
+                            <input type="checkbox" id="hadithKisa" class="w-5 h-5 rounded checkbox-custom accent-green-600">
+                            <span class="text-sm">حدیث کسا</span>
+                        </label>
+                        <label class="flex items-center gap-2 p-3 rounded-xl cursor-pointer transition-all hover:scale-[1.02]"
+                               style="background: var(--bg-main)">
+                            <input type="checkbox" id="duaTawassul" class="w-5 h-5 rounded checkbox-custom accent-green-600">
+                            <span class="text-sm">زیارت توسل</span>
+                        </label>
+                        <label class="flex items-center gap-2 p-3 rounded-xl cursor-pointer transition-all hover:scale-[1.02]"
+                               style="background: var(--bg-main)">
+                            <input type="checkbox" id="duaKumayl" class="w-5 h-5 rounded checkbox-custom accent-green-600">
+                            <span class="text-sm">دعای کمیل</span>
+                        </label>
+                    </div>
+                </div>
+
+                <!-- Quran Section -->
+                <div class="mb-6">
+                    <h3 class="font-bold mb-3 flex items-center gap-2" style="color: var(--text-secondary)">
+                        <span>📚</span>
+                        تلاوت قرآن
+                    </h3>
+                    <div class="flex items-center justify-between p-4 rounded-xl" style="background: var(--bg-main)">
+                        <span class="text-sm font-medium">تعداد صفحات خوانده شده:</span>
+                        <div class="quran-counter">
+                            <button type="button" class="quran-btn" id="quranMinus" onclick="changeQuranPages(-1)">−</button>
+                            <div class="quran-display" id="quranDisplay">0</div>
+                            <button type="button" class="quran-btn" id="quranPlus" onclick="changeQuranPages(1)">+</button>
+                        </div>
+                        <input type="hidden" id="quranPages" value="0">
+                    </div>
+                </div>
+
+                <!-- Submit Button -->
+                <button id="submitBtn" onclick="saveDaily()" 
+                        class="w-full py-4 bg-gradient-to-l from-green-600 to-green-500 text-white rounded-2xl font-bold text-lg shadow-lg hover:shadow-xl transition-all pulse-green">
+                    ثبت اعمال
+                </button>
+            </div>
+        </section>
+
+        <!-- Dashboard Page -->
+        <section id="dashboardPage" class="page hidden">
+            <div class="card rounded-2xl p-4 mb-4 shadow-md slide-up">
+                <h2 class="text-lg font-bold mb-4 flex items-center gap-2" style="color: var(--text-main)">
+                    <span>📊</span>
+                    کارنامه اعمال
+                </h2>
+
+                <!-- Period Selector -->
+                <div class="flex gap-2 mb-4">
+                    <button onclick="showReport('week')" id="weekBtn" 
+                            class="flex-1 py-2 rounded-xl font-medium transition-all bg-green-600 text-white">
+                        هفته اخیر
+                    </button>
+                    <button onclick="showReport('month')" id="monthBtn"
+                            class="flex-1 py-2 rounded-xl font-medium transition-all"
+                            style="background: var(--bg-main); color: var(--text-main)">
+                        ماه اخیر
+                    </button>
+                </div>
+
+                <!-- Stats Cards -->
+                <div class="grid grid-cols-2 gap-3 mb-4">
+                    <div class="p-4 rounded-xl text-center" style="background: var(--bg-main)">
+                        <p class="text-2xl font-bold text-green-600" id="earlyPrayers">0</p>
+                        <p class="text-xs opacity-70">نماز اول وقت</p>
+                    </div>
+                    <div class="p-4 rounded-xl text-center" style="background: var(--bg-main)">
+                        <p class="text-2xl font-bold text-yellow-600" id="midPrayers">0</p>
+                        <p class="text-xs opacity-70">نماز میان وقت</p>
+                    </div>
+                    <div class="p-4 rounded-xl text-center" style="background: var(--bg-main)">
+                        <p class="text-2xl font-bold text-orange-600" id="latePrayers">0</p>
+                        <p class="text-xs opacity-70">نماز آخر وقت</p>
+                    </div>
+                    <div class="p-4 rounded-xl text-center" style="background: var(--bg-main)">
+                        <p class="text-2xl font-bold text-red-600" id="qazaPrayers">0</p>
+                        <p class="text-xs opacity-70">نماز قضا</p>
+                    </div>
+                    <div class="p-4 rounded-xl text-center" style="background: var(--bg-main)">
+                        <p class="text-2xl font-bold text-green-600" id="totalDuas">0</p>
+                        <p class="text-xs opacity-70">دعا و زیارت</p>
+                    </div>
+                    <div class="p-4 rounded-xl text-center" style="background: var(--bg-main)">
+                        <p class="text-2xl font-bold text-green-600" id="totalQuran">0</p>
+                        <p class="text-xs opacity-70">صفحه قرآن</p>
+                    </div>
+                </div>
+
+                <!-- Prayer Time Chart -->
+                <div class="mb-4 p-4 rounded-xl" style="background: var(--bg-main)">
+                    <h3 class="font-bold mb-3 text-sm" style="color: var(--text-secondary)">نمودار کیفیت نمازها</h3>
+                    <canvas id="prayerChart" height="200"></canvas>
+                </div>
+
+                <!-- Activity Chart -->
+                <div class="p-4 rounded-xl" style="background: var(--bg-main)">
+                    <h3 class="font-bold mb-3 text-sm" style="color: var(--text-secondary)">نمودار فعالیت روزانه</h3>
+                    <canvas id="activityChart" height="200"></canvas>
+                </div>
+            </div>
+        </section>
+
+        <!-- Settings Page -->
+        <section id="settingsPage" class="page hidden">
+            <div class="card rounded-2xl p-4 mb-4 shadow-md slide-up">
+                <h2 class="text-lg font-bold mb-4 flex items-center gap-2" style="color: var(--text-main)">
+                    <span>⚙️</span>
+                    تنظیمات
+                </h2>
+                
+                <!-- Dark Mode Toggle -->
+                <div class="flex items-center justify-between p-4 rounded-xl mb-4" style="background: var(--bg-main)">
+                    <div class="flex items-center gap-3">
+                        <span class="text-2xl">🌙</span>
+                        <div>
+                            <p class="font-medium">حالت تاریک</p>
+                            <p class="text-xs opacity-70">تغییر تم برنامه</p>
+                        </div>
+                    </div>
+                    <label class="toggle-switch">
+                        <input type="checkbox" id="darkModeToggle" onchange="toggleDarkMode()">
+                        <span class="toggle-slider"></span>
+                    </label>
+                </div>
+
+                <!-- Scoring Info -->
+                <div class="p-4 rounded-xl" style="background: var(--bg-main)">
+                    <h3 class="font-bold mb-3 flex items-center gap-2" style="color: var(--text-secondary)">
+                        <span>⭐</span>
+                        راهنمای امتیازدهی
+                    </h3>
+                    <div class="space-y-2 text-sm">
+                        <div class="flex justify-between p-2 rounded-lg" style="background: var(--bg-card)">
+                            <span>نماز اول وقت</span>
+                            <span class="font-bold text-green-600">۳۰ امتیاز</span>
+                        </div>
+                        <div class="flex justify-between p-2 rounded-lg" style="background: var(--bg-card)">
+                            <span>نماز میان وقت</span>
+                            <span class="font-bold text-yellow-600">۲۰ امتیاز</span>
+                        </div>
+                        <div class="flex justify-between p-2 rounded-lg" style="background: var(--bg-card)">
+                            <span>نماز آخر وقت</span>
+                            <span class="font-bold text-orange-600">۱۰ امتیاز</span>
+                        </div>
+                        <div class="flex justify-between p-2 rounded-lg" style="background: var(--bg-card)">
+                            <span>نماز قضا</span>
+                            <span class="font-bold text-red-600">۰ امتیاز</span>
+                        </div>
+                        <div class="flex justify-between p-2 rounded-lg" style="background: var(--bg-card)">
+                            <span>هر دعا یا زیارت</span>
+                            <span class="font-bold text-green-600">۱۵ امتیاز</span>
+                        </div>
+                        <div class="flex justify-between p-2 rounded-lg" style="background: var(--bg-card)">
+                            <span>هر صفحه قرآن</span>
+                            <span class="font-bold text-green-600">۵ امتیاز</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- App Info -->
+                <div class="mt-4 p-4 rounded-xl text-center" style="background: var(--bg-main)">
+                    <p class="text-2xl mb-2">🕌</p>
+                    <p class="font-bold" style="color: var(--text-main)">دستیار بندگی</p>
+                    <p class="text-xs opacity-70">نسخه ۱.۰</p>
+                    <p class="text-xs opacity-50 mt-2">یاری‌گر شما در مسیر بندگی</p>
+                </div>
+
+                <!-- Developer Info -->
+                <div class="mt-4 p-4 rounded-xl" style="background: linear-gradient(135deg, #1e40af 0%, #3b82f6 100%)">
+                    <div class="text-center text-white">
+                        <p class="text-2xl mb-2">🎮</p>
+                        <p class="font-bold mb-2">درباره سازنده</p>
+                        <p class="text-sm leading-relaxed opacity-90 mb-4">
+                            این اثر توسط شرکت جاودان گیمز طراحی و منتشر شده است. جهت کسب اطلاعات بیشتر از ما روی دکمه زیر کلیک کنید.
+                        </p>
+                        <a href="https://javadcamback.github.io/Javdan_Games/" target="_blank" 
+                           class="inline-block px-6 py-3 bg-white text-blue-600 rounded-xl font-bold shadow-lg hover:shadow-xl transition-all hover:scale-105">
+                            🌐 بازدید از سایت
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- Bottom Navigation -->
+    <nav class="fixed bottom-0 left-0 right-0 shadow-lg z-50" style="background: var(--bg-card); border-top: 1px solid var(--border-color)">
+        <div class="flex justify-around py-2">
+            <button onclick="showPage('daily')" class="nav-item flex flex-col items-center p-2 rounded-xl transition-all active" id="navDaily">
+                <span class="text-xl">📝</span>
+                <span class="text-xs mt-1">ثبت روزانه</span>
+            </button>
+            <button onclick="showPage('dashboard')" class="nav-item flex flex-col items-center p-2 rounded-xl transition-all" id="navDashboard">
+                <span class="text-xl">📊</span>
+                <span class="text-xs mt-1">کارنامه اعمال</span>
+            </button>
+            <button onclick="showPage('settings')" class="nav-item flex flex-col items-center p-2 rounded-xl transition-all" id="navSettings">
+                <span class="text-xl">⚙️</span>
+                <span class="text-xs mt-1">تنظیمات</span>
+            </button>
+        </div>
+    </nav>
+
+    <script>
+        // Persian Date Converter
+        const persianMonths = ['فروردین', 'اردیبهشت', 'خرداد', 'تیر', 'مرداد', 'شهریور', 'مهر', 'آبان', 'آذر', 'دی', 'بهمن', 'اسفند'];
+        const persianDays = ['یکشنبه', 'دوشنبه', 'سه‌شنبه', 'چهارشنبه', 'پنجشنبه', 'جمعه', 'شنبه'];
+
+        function gregorianToJalali(gy, gm, gd) {
+            const g_d_m = [0, 31, 59, 90, 120, 151, 181, 212, 243, 273, 304, 334];
+            let jy = (gy <= 1600) ? 0 : 979;
+            gy -= (gy <= 1600) ? 621 : 1600;
+            const gy2 = (gm > 2) ? (gy + 1) : gy;
+            let days = (365 * gy) + (Math.floor((gy2 + 3) / 4)) - (Math.floor((gy2 + 99) / 100)) + (Math.floor((gy2 + 399) / 400)) - 80 + gd + g_d_m[gm - 1];
+            jy += 33 * (Math.floor(days / 12053));
+            days %= 12053;
+            jy += 4 * (Math.floor(days / 1461));
+            days %= 1461;
+            jy += Math.floor((days - 1) / 365);
+            if (days > 365) days = (days - 1) % 365;
+            const jm = (days < 186) ? 1 + Math.floor(days / 31) : 7 + Math.floor((days - 186) / 30);
+            const jd = 1 + ((days < 186) ? (days % 31) : ((days - 186) % 30));
+            return [jy, jm, jd];
+        }
+
+        function jalaliToGregorian(jy, jm, jd) {
+            let gy = (jy <= 979) ? 621 : 1600;
+            jy -= (jy <= 979) ? 0 : 979;
+            const days = (365 * jy) + ((Math.floor(jy / 33)) * 8) + (Math.floor(((jy % 33) + 3) / 4)) + 78 + jd + ((jm < 7) ? (jm - 1) * 31 : ((jm - 7) * 30) + 186);
+            gy += 400 * (Math.floor(days / 146097));
+            let d = days % 146097;
+            if (d > 36524) {
+                gy += 100 * (Math.floor(--d / 36524));
+                d %= 36524;
+                if (d >= 365) d++;
+            }
+            gy += 4 * (Math.floor(d / 1461));
+            d %= 1461;
+            gy += Math.floor((d - 1) / 365);
+            if (d > 365) d = (d - 1) % 365;
+            const gd = d + 1;
+            const sal_a = [0, 31, ((gy % 4 === 0 && gy % 100 !== 0) || (gy % 400 === 0)) ? 29 : 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31];
+            let gm = 0;
+            let v = 0;
+            for (let i = 0; i < 13; i++) {
+                v += sal_a[i];
+                if (v >= gd) {
+                    gm = i;
+                    break;
+                }
+            }
+            return [gy, gm, gd - v + sal_a[gm]];
+        }
+
+        function getPersianDateString(date) {
+            const jalali = gregorianToJalali(date.getFullYear(), date.getMonth() + 1, date.getDate());
+            return `${jalali[2]} ${persianMonths[jalali[1] - 1]} ${jalali[0]}`;
+        }
+
+        function getPersianDayName(date) {
+            return persianDays[date.getDay()];
+        }
+
+        function getDateKey(date) {
+            const jalali = gregorianToJalali(date.getFullYear(), date.getMonth() + 1, date.getDate());
+            return `${jalali[0]}-${jalali[1]}-${jalali[2]}`;
+        }
+
+        // Hadiths from Imam Ali (AS)
+        const hadiths = [
+            "ارزش هر کس به اندازه همت اوست.",
+            "بزرگ‌ترین ثروت، عقل است و بزرگ‌ترین فقر، حماقت.",
+            "زبان عاقل در پشت قلب اوست و قلب احمق پشت زبانش.",
+            "صبر دو گونه است: صبر بر آنچه ناخوشایند است و صبر از آنچه دوست داری.",
+            "دوست واقعی کسی است که در سختی‌ها همراه تو باشد.",
+            "سکوت بهترین پاسخ به نادان است.",
+            "کسی که خود را بشناسد، پروردگارش را شناخته است.",
+            "در مشورت با دیگران، بهترین تصمیمات گرفته می‌شود.",
+            "شکرگزاری نعمت را افزایش می‌دهد.",
+            "بخشندگی از بزرگی روح است.",
+            "تواضع زینت دانش است.",
+            "خشم، عقل را می‌پوشاند.",
+            "کم گویی و درست گویی، نشانه عقل است.",
+            "مردم دشمن چیزی هستند که نمی‌دانند.",
+            "در نیکی کردن شتاب کن پیش از آنکه نتوانی.",
+            "فرصت مثل ابر می‌گذرد، پس فرصت‌های خیر را غنیمت شمار.",
+            "راز موفقیت، پشتکار است.",
+            "سخاوت با مال، بخشندگی است و سخاوت با نفس، شجاعت.",
+            "کسی که به خود اعتماد کند، مردم نیز به او اعتماد خواهند کرد.",
+            "بهترین دوست، کتاب است.",
+            "علم بهتر از ثروت است، زیرا علم تو را نگه می‌دارد و ثروت را تو نگه می‌داری.",
+            "دنیا مزرعه آخرت است.",
+            "بر نیکوکاری صبور باش هر چند خسته‌ات کند.",
+            "ترس از خدا، آغاز حکمت است.",
+            "هر روز که گناه نکنی، روز عید توست.",
+            "خود را به خوبی‌ها عادت ده، زیرا خوبی عادت می‌شود.",
+            "مهربانی کلیدی است که هر قفلی را باز می‌کند.",
+            "از کسی که تو را تحسین زیاد می‌کند، بر حذر باش.",
+            "تنها بودن بهتر از همنشین بد است.",
+            "بهترین میراث، ادب نیکوست."
+        ];
+
+        // Score values
+        const SCORES = {
+            prayerEarly: 30,
+            prayerMid: 20,
+            prayerLate: 10,
+            dua: 15,
+            quranPage: 5
+        };
+
+        let allData = {};
+        let currentPeriod = 'week';
+        let prayerChart = null;
+        let activityChart = null;
+        let selectedDate = new Date();
+        let quranPages = 0;
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', function() {
+            loadData();
+            selectedDate = new Date();
+            updateDateDisplay();
+            showDailyHadith();
+            checkDarkMode();
+            loadDayData(getDateKey(selectedDate));
+            updateDateStatus();
+        });
+
+        // Load data from localStorage
+        function loadData() {
+            const saved = localStorage.getItem('bandegi_data');
+            if (saved) {
+                allData = JSON.parse(saved);
+            }
+        }
+
+        // Save data to localStorage
+        function saveData() {
+            localStorage.setItem('bandegi_data', JSON.stringify(allData));
+        }
+
+        // Update date display
+        function updateDateDisplay() {
+            document.getElementById('currentPersianDate').textContent = getPersianDateString(selectedDate);
+            document.getElementById('currentDayName').textContent = getPersianDayName(selectedDate);
+            
+            // Update Hijri date in header
+            try {
+                const hijriDate = selectedDate.toLocaleDateString('fa-IR-u-ca-islamic', { 
+                    year: 'numeric', 
+                    month: 'long', 
+                    day: 'numeric' 
+                });
+                document.getElementById('hijriDate').textContent = hijriDate;
+            } catch(e) {
+                document.getElementById('hijriDate').textContent = '';
+            }
+            
+            // Update navigation buttons
+            const today = new Date();
+            today.setHours(0, 0, 0, 0);
+            const selected = new Date(selectedDate);
+            selected.setHours(0, 0, 0, 0);
+            
+            // Disable next day button if it would go to future
+            const tomorrow = new Date(selected);
+            tomorrow.setDate(tomorrow.getDate() + 1);
+            document.getElementById('nextDayBtn').disabled = tomorrow > today;
+        }
+
+        // Change date
+        function changeDate(direction) {
+            const today = new Date();
+            today.setHours(0, 0, 0, 0);
+            
+            const newDate = new Date(selectedDate);
+            newDate.setDate(newDate.getDate() + direction);
+            newDate.setHours(0, 0, 0, 0);
+            
+            // Don't allow going to future dates
+            if (newDate > today) {
+                return;
+            }
+            
+            selectedDate = newDate;
+            updateDateDisplay();
+            loadDayData(getDateKey(selectedDate));
+            updateDateStatus();
+        }
+
+        // Show daily hadith
+        function showDailyHadith() {
+            const today = new Date();
+            const dayOfYear = Math.floor((today - new Date(today.getFullYear(), 0, 0)) / 86400000);
+            const index = dayOfYear % hadiths.length;
+            document.getElementById('dailyHadith').textContent = hadiths[index];
+        }
+
+        // Load data for a specific day
+        function loadDayData(dateKey) {
+            const dayData = allData[dateKey];
+            
+            // Reset form
+            document.getElementById('prayerFajr').value = '';
+            document.getElementById('prayerDhuhr').value = '';
+            document.getElementById('prayerMaghrib').value = '';
+            document.getElementById('duaAshura').checked = false;
+            document.getElementById('duaAlyasin').checked = false;
+            document.getElementById('duaAminullah').checked = false;
+            document.getElementById('duaSalavat').checked = false;
+            document.getElementById('duaAhd').checked = false;
+            document.getElementById('hadithKisa').checked = false;
+            document.getElementById('duaTawassul').checked = false;
+            document.getElementById('duaKumayl').checked = false;
+            quranPages = 0;
+            document.getElementById('quranPages').value = 0;
+            document.getElementById('quranDisplay').textContent = '0';
+            
+            // Load existing data
+            if (dayData) {
+                document.getElementById('prayerFajr').value = dayData.prayerFajr || '';
+                document.getElementById('prayerDhuhr').value = dayData.prayerDhuhr || '';
+                document.getElementById('prayerMaghrib').value = dayData.prayerMaghrib || '';
+                document.getElementById('duaAshura').checked = dayData.duaAshura || false;
+                document.getElementById('duaAlyasin').checked = dayData.duaAlyasin || false;
+                document.getElementById('duaAminullah').checked = dayData.duaAminullah || false;
+                document.getElementById('duaSalavat').checked = dayData.duaSalavat || false;
+                document.getElementById('duaAhd').checked = dayData.duaAhd || false;
+                document.getElementById('hadithKisa').checked = dayData.hadithKisa || false;
+                document.getElementById('duaTawassul').checked = dayData.duaTawassul || false;
+                document.getElementById('duaKumayl').checked = dayData.duaKumayl || false;
+                quranPages = dayData.quranPages || 0;
+                document.getElementById('quranPages').value = quranPages;
+                document.getElementById('quranDisplay').textContent = quranPages;
+            }
+            
+            updateDateStatus();
+        }
+
+        // Change Quran pages
+        function changeQuranPages(delta) {
+            quranPages = Math.max(0, Math.min(604, quranPages + delta));
+            document.getElementById('quranPages').value = quranPages;
+            document.getElementById('quranDisplay').textContent = quranPages;
+        }
+
+        // Update date status message
+        function updateDateStatus() {
+            const dateKey = getDateKey(selectedDate);
+            const today = new Date();
+            today.setHours(0, 0, 0, 0);
+            const selected = new Date(selectedDate);
+            selected.setHours(0, 0, 0, 0);
+            
+            const statusDiv = document.getElementById('dateStatus');
+            const submitBtn = document.getElementById('submitBtn');
+            const dayData = allData[dateKey];
+            
+            // Get form elements
+            const formElements = document.querySelectorAll('#dailyPage select, #dailyPage input[type="checkbox"]');
+            const quranBtns = document.querySelectorAll('.quran-btn');
+            
+            if (selected > today) {
+                // Future date
+                statusDiv.innerHTML = '<span class="text-red-500">❌ امکان ثبت برای روزهای آینده وجود ندارد</span>';
+                statusDiv.style.background = '#fef2f2';
+                submitBtn.disabled = true;
+                submitBtn.classList.add('opacity-50');
+                submitBtn.textContent = 'ثبت اعمال';
+                formElements.forEach(el => el.disabled = true);
+                quranBtns.forEach(btn => btn.disabled = true);
+            } else if (dayData && dayData.submitted) {
+                // Already submitted
+                statusDiv.innerHTML = '<span class="text-green-600">✅ اعمال این روز ثبت شده است</span>';
+                statusDiv.style.background = '#f0fdf4';
+                submitBtn.disabled = true;
+                submitBtn.classList.add('opacity-50');
+                submitBtn.textContent = 'ثبت شده ✓';
+                formElements.forEach(el => el.disabled = true);
+                quranBtns.forEach(btn => btn.disabled = true);
+            } else if (selected < today) {
+                // Past date, not submitted
+                statusDiv.innerHTML = '<span class="text-yellow-600">⚠️ این روز گذشته است - می‌توانید اعمال را ثبت کنید</span>';
+                statusDiv.style.background = '#fefce8';
+                submitBtn.disabled = false;
+                submitBtn.classList.remove('opacity-50');
+                submitBtn.textContent = 'ثبت اعمال';
+                formElements.forEach(el => el.disabled = false);
+                quranBtns.forEach(btn => btn.disabled = false);
+            } else {
+                // Today, not submitted
+                statusDiv.innerHTML = '<span class="text-blue-600">📝 امروز - آماده ثبت</span>';
+                statusDiv.style.background = '#eff6ff';
+                submitBtn.disabled = false;
+                submitBtn.classList.remove('opacity-50');
+                submitBtn.textContent = 'ثبت اعمال';
+                formElements.forEach(el => el.disabled = false);
+                quranBtns.forEach(btn => btn.disabled = false);
+            }
+        }
+
+        // Save daily data
+        function saveDaily() {
+            const dateKey = getDateKey(selectedDate);
+            const today = new Date();
+            today.setHours(0, 0, 0, 0);
+            const selected = new Date(selectedDate);
+            selected.setHours(0, 0, 0, 0);
+            
+            if (selected > today) {
+                alert('امکان ثبت برای روزهای آینده وجود ندارد');
+                return;
+            }
+            
+            if (allData[dateKey] && allData[dateKey].submitted) {
+                alert('اطلاعات این روز قبلاً ثبت شده و قابل تغییر نیست');
+                return;
+            }
+            
+            const dayData = {
+                prayerFajr: document.getElementById('prayerFajr').value,
+                prayerDhuhr: document.getElementById('prayerDhuhr').value,
+                prayerMaghrib: document.getElementById('prayerMaghrib').value,
+                duaAshura: document.getElementById('duaAshura').checked,
+                duaAlyasin: document.getElementById('duaAlyasin').checked,
+                duaAminullah: document.getElementById('duaAminullah').checked,
+                duaSalavat: document.getElementById('duaSalavat').checked,
+                duaAhd: document.getElementById('duaAhd').checked,
+                hadithKisa: document.getElementById('hadithKisa').checked,
+                duaTawassul: document.getElementById('duaTawassul').checked,
+                duaKumayl: document.getElementById('duaKumayl').checked,
+                quranPages: quranPages,
+                submitted: true,
+                submittedAt: new Date().toISOString()
+            };
+            
+            allData[dateKey] = dayData;
+            saveData();
+            
+            // Update button
+            const btn = document.getElementById('submitBtn');
+            btn.textContent = 'ثبت شد ✓';
+            btn.disabled = true;
+            btn.classList.add('opacity-50');
+            
+            // Disable form elements
+            const formElements = document.querySelectorAll('#dailyPage select, #dailyPage input[type="checkbox"]');
+            const quranBtns = document.querySelectorAll('.quran-btn');
+            formElements.forEach(el => el.disabled = true);
+            quranBtns.forEach(btn => btn.disabled = true);
+            
+            updateDateStatus();
+            
+            // Show success message
+            alert('اعمال روزانه با موفقیت ثبت شد 🌟');
+        }
+
+        // Show page
+        function showPage(page) {
+            // Hide all pages
+            document.querySelectorAll('.page').forEach(p => p.classList.add('hidden'));
+            document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+            
+            // Show selected page
+            document.getElementById(page + 'Page').classList.remove('hidden');
+            document.getElementById('nav' + page.charAt(0).toUpperCase() + page.slice(1)).classList.add('active');
+            
+            if (page === 'dashboard') {
+                updateDashboard();
+            }
+        }
+
+        // Show report
+        function showReport(period) {
+            currentPeriod = period;
+            document.getElementById('weekBtn').classList.remove('bg-green-600', 'text-white');
+            document.getElementById('monthBtn').classList.remove('bg-green-600', 'text-white');
+            document.getElementById(period + 'Btn').classList.add('bg-green-600', 'text-white');
+            
+            document.getElementById('weekBtn').style.background = period === 'week' ? '' : 'var(--bg-main)';
+            document.getElementById('monthBtn').style.background = period === 'month' ? '' : 'var(--bg-main)';
+            
+            updateDashboard();
+        }
+
+        // Update dashboard
+        function updateDashboard() {
+            const days = currentPeriod === 'week' ? 7 : 30;
+            const today = new Date();
+            let earlyPrayers = 0;
+            let midPrayers = 0;
+            let latePrayers = 0;
+            let qazaPrayers = 0;
+            let totalDuas = 0;
+            let totalQuran = 0;
+            
+            const dailyScores = [];
+            const labels = [];
+            
+            for (let i = days - 1; i >= 0; i--) {
+                const date = new Date(today);
+                date.setDate(date.getDate() - i);
+                const dateKey = getDateKey(date);
+                const dayData = allData[dateKey];
+                
+                let dayScore = 0;
+                
+                if (dayData) {
+                    // Count prayers
+                    const prayers = ['prayerFajr', 'prayerDhuhr', 'prayerMaghrib'];
+                    prayers.forEach(prayer => {
+                        if (dayData[prayer]) {
+                            if (dayData[prayer] === 'early') {
+                                earlyPrayers++;
+                                dayScore += SCORES.prayerEarly;
+                            } else if (dayData[prayer] === 'mid') {
+                                midPrayers++;
+                                dayScore += SCORES.prayerMid;
+                            } else if (dayData[prayer] === 'late') {
+                                latePrayers++;
+                                dayScore += SCORES.prayerLate;
+                            } else if (dayData[prayer] === 'qaza') {
+                                qazaPrayers++;
+                                // No score for qaza prayers
+                            }
+                        }
+                    });
+                    
+                    // Count duas
+                    const duas = ['duaAshura', 'duaAlyasin', 'duaAminullah', 'duaSalavat', 'duaAhd', 'hadithKisa', 'duaTawassul', 'duaKumayl'];
+                    duas.forEach(dua => {
+                        if (dayData[dua]) {
+                            totalDuas++;
+                            dayScore += SCORES.dua;
+                        }
+                    });
+                    
+                    // Quran pages
+                    if (dayData.quranPages) {
+                        totalQuran += dayData.quranPages;
+                        dayScore += dayData.quranPages * SCORES.quranPage;
+                    }
+                }
+                
+                dailyScores.push(dayScore);
+                const jalali = gregorianToJalali(date.getFullYear(), date.getMonth() + 1, date.getDate());
+                labels.push(`${jalali[2]} ${persianMonths[jalali[1] - 1].substring(0, 3)}`);
+            }
+            
+            // Update stats
+            document.getElementById('earlyPrayers').textContent = earlyPrayers;
+            document.getElementById('midPrayers').textContent = midPrayers;
+            document.getElementById('latePrayers').textContent = latePrayers;
+            document.getElementById('qazaPrayers').textContent = qazaPrayers;
+            document.getElementById('totalDuas').textContent = totalDuas;
+            document.getElementById('totalQuran').textContent = totalQuran;
+            
+            // Update charts
+            updatePrayerChart(earlyPrayers, midPrayers, latePrayers, qazaPrayers);
+            updateActivityChart(labels, dailyScores);
+        }
+
+        // Update prayer chart
+        function updatePrayerChart(early, mid, late, qaza) {
+            const ctx = document.getElementById('prayerChart').getContext('2d');
+            
+            if (prayerChart) {
+                prayerChart.destroy();
+            }
+            
+            prayerChart = new Chart(ctx, {
+                type: 'doughnut',
+                data: {
+                    labels: ['اول وقت', 'میان وقت', 'آخر وقت', 'نماز قضا'],
+                    datasets: [{
+                        data: [early, mid, late, qaza],
+                        backgroundColor: ['#22c55e', '#eab308', '#f97316', '#dc2626'],
+                        borderWidth: 0
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    plugins: {
+                        legend: {
+                            position: 'bottom',
+                            labels: {
+                                font: { family: 'Vazirmatn' }
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        // Update activity chart
+        function updateActivityChart(labels, data) {
+            const ctx = document.getElementById('activityChart').getContext('2d');
+            
+            if (activityChart) {
+                activityChart.destroy();
+            }
+            
+            activityChart = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: 'امتیاز روزانه',
+                        data: data,
+                        borderColor: '#22c55e',
+                        backgroundColor: 'rgba(34, 197, 94, 0.1)',
+                        fill: true,
+                        tension: 0.4
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    scales: {
+                        y: {
+                            beginAtZero: true
+                        }
+                    },
+                    plugins: {
+                        legend: {
+                            display: false
+                        }
+                    }
+                }
+            });
+        }
+
+        // Dark mode functions
+        function checkDarkMode() {
+            const isDark = localStorage.getItem('bandegi_dark') === 'true';
+            if (isDark) {
+                document.documentElement.classList.add('dark');
+                document.getElementById('darkModeToggle').checked = true;
+            }
+        }
+
+        function toggleDarkMode() {
+            const isDark = document.getElementById('darkModeToggle').checked;
+            if (isDark) {
+                document.documentElement.classList.add('dark');
+            } else {
+                document.documentElement.classList.remove('dark');
+            }
+            localStorage.setItem('bandegi_dark', isDark);
+        }
+    </script>
+</body>
+</html>
