@@ -125,29 +125,35 @@
         }
         
         .date-nav-btn {
-            width: 40px;
-            height: 40px;
+            width: 44px;
+            height: 44px;
             border-radius: 50%;
             display: flex;
             align-items: center;
             justify-content: center;
-            background: var(--bg-main);
-            border: 2px solid var(--border-color);
-            color: var(--text-main);
+            background: linear-gradient(135deg, var(--primary) 0%, #15803d 100%);
+            border: none;
+            color: white;
             font-size: 1.2rem;
             cursor: pointer;
             transition: all 0.3s;
+            box-shadow: 0 4px 12px rgba(34, 197, 94, 0.3);
         }
         
         .date-nav-btn:hover:not(:disabled) {
-            background: var(--primary);
-            color: white;
-            border-color: var(--primary);
+            transform: scale(1.1);
+            box-shadow: 0 6px 16px rgba(34, 197, 94, 0.4);
+        }
+        
+        .date-nav-btn:active:not(:disabled) {
+            transform: scale(0.95);
         }
         
         .date-nav-btn:disabled {
-            opacity: 0.4;
+            opacity: 0.3;
             cursor: not-allowed;
+            background: #9ca3af;
+            box-shadow: none;
         }
         
         .quran-counter {
@@ -211,6 +217,14 @@
         </div>
     </header>
 
+    <!-- Toast Notification -->
+    <div id="toast" class="fixed top-20 left-1/2 transform -translate-x-1/2 px-6 py-3 rounded-2xl shadow-2xl z-[100] transition-all duration-300 opacity-0 pointer-events-none" style="background: linear-gradient(135deg, #22c55e 0%, #15803d 100%); color: white;">
+        <div class="flex items-center gap-2">
+            <span class="text-xl">✅</span>
+            <span class="font-medium" id="toastMessage">اطلاعات ثبت شد</span>
+        </div>
+    </div>
+
     <!-- Hadith Section -->
     <div id="hadithBox" class="hadith-box mx-4 mt-4 p-4 rounded-2xl shadow-lg slide-up">
         <div class="flex items-start gap-2">
@@ -222,18 +236,22 @@
         </div>
     </div>
 
-    <!-- Date Navigation -->
-    <div class="card mx-4 mt-4 p-4 rounded-2xl shadow-md slide-up">
+    <!-- Date Navigation - Only visible in daily page -->
+    <div id="dateNavigation" class="card mx-4 mt-4 p-4 rounded-2xl shadow-md slide-up">
         <div class="flex items-center justify-between">
-            <button id="nextDayBtn" class="date-nav-btn" onclick="changeDate(1)">
-                ◀
+            <button id="prevDayBtn" class="date-nav-btn" onclick="changeDate(-1)" title="روز قبل">
+                <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+                    <polyline points="9 18 15 12 9 6"></polyline>
+                </svg>
             </button>
             <div class="text-center flex-1">
                 <p id="currentPersianDate" class="text-lg font-bold" style="color: var(--text-main)"></p>
                 <p id="currentDayName" class="text-sm opacity-70"></p>
             </div>
-            <button id="prevDayBtn" class="date-nav-btn" onclick="changeDate(-1)">
-                ▶
+            <button id="nextDayBtn" class="date-nav-btn" onclick="changeDate(1)" title="روز بعد">
+                <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+                    <polyline points="15 18 9 12 15 6"></polyline>
+                </svg>
             </button>
         </div>
     </div>
@@ -833,6 +851,19 @@
             }
         }
 
+        // Show toast notification
+        function showToast(message) {
+            const toast = document.getElementById('toast');
+            document.getElementById('toastMessage').textContent = message;
+            toast.classList.remove('opacity-0', 'pointer-events-none');
+            toast.classList.add('opacity-100');
+            
+            setTimeout(() => {
+                toast.classList.remove('opacity-100');
+                toast.classList.add('opacity-0', 'pointer-events-none');
+            }, 3000);
+        }
+
         // Save daily data
         function saveDaily() {
             const dateKey = getDateKey(selectedDate);
@@ -842,12 +873,12 @@
             selected.setHours(0, 0, 0, 0);
             
             if (selected > today) {
-                alert('امکان ثبت برای روزهای آینده وجود ندارد');
+                showToast('امکان ثبت برای روزهای آینده وجود ندارد ❌');
                 return;
             }
             
             if (allData[dateKey] && allData[dateKey].submitted) {
-                alert('اطلاعات این روز قبلاً ثبت شده و قابل تغییر نیست');
+                showToast('اطلاعات این روز قبلاً ثبت شده ❌');
                 return;
             }
             
@@ -885,8 +916,8 @@
             
             updateDateStatus();
             
-            // Show success message
-            alert('اعمال روزانه با موفقیت ثبت شد 🌟');
+            // Show success toast
+            showToast('اعمال روزانه با موفقیت ثبت شد 🌟');
         }
 
         // Show page
@@ -898,6 +929,14 @@
             // Show selected page
             document.getElementById(page + 'Page').classList.remove('hidden');
             document.getElementById('nav' + page.charAt(0).toUpperCase() + page.slice(1)).classList.add('active');
+            
+            // Show/hide date navigation based on page
+            const dateNav = document.getElementById('dateNavigation');
+            if (page === 'daily') {
+                dateNav.style.display = 'block';
+            } else {
+                dateNav.style.display = 'none';
+            }
             
             if (page === 'dashboard') {
                 updateDashboard();
